@@ -13,7 +13,7 @@ versions.
 1. [Upgrade overview](#upgrade-overview)
 2. [Branch conventions](#branch-conventions)
 3. [Upgrade checklist (generic)](#upgrade-checklist-generic)
-4. [LLVM 14 → 15 upgrade guide](#llvm-14--15-upgrade-guide)
+4. [LLVM 14 -> 15 upgrade guide](#llvm-14--15-upgrade-guide)
    - [sea-dsa](#sea-dsa-llvm-14--15)
    - [llvm-seahorn](#llvm-seahorn-llvm-14--15)
    - [seahorn](#seahorn-llvm-14--15)
@@ -81,7 +81,7 @@ For each repo:
 
 ---
 
-## LLVM 14 → 15 upgrade guide
+## LLVM 14 -> 15 upgrade guide
 
 LLVM 15 is the first release to **enable opaque pointers by default**.
 This is the dominant change; almost every API migration in this section
@@ -92,7 +92,7 @@ Reference commits:
 - llvm-seahorn `dev15` branch: https://github.com/seahorn/llvm-seahorn/tree/dev15
 - sea-dsa `dev15` branch: https://github.com/seahorn/sea-dsa/tree/dev15
 
-### sea-dsa (LLVM 14 → 15)
+### sea-dsa (LLVM 14 -> 15)
 
 **Key reference commit:** `8248b6b` ("LLVM 15 Port")
 and follow-up commits on the `dev15` branch.
@@ -166,7 +166,7 @@ Tracked as **sea-dsa issue 176**.
 
 ---
 
-### llvm-seahorn (LLVM 14 → 15)
+### llvm-seahorn (LLVM 14 -> 15)
 
 llvm-seahorn forks several LLVM passes directly from the LLVM source tree and
 applies SeaHorn-specific patches on top.  The upgrade process is a **3-way
@@ -207,7 +207,7 @@ The upstream `InstCombineAndOrXor.cpp` was heavily restructured in LLVM 15
    turned into unsigned ones.
 
 2. Re-apply the **`AvoidBv`** guard inside the
-   `(icmp eq A,0) & (icmp eq B,0)` → `icmp eq (A|B),0` fold.
+   `(icmp eq A,0) & (icmp eq B,0)` -> `icmp eq (A|B),0` fold.
 
 3. **Duplicate symbol fix**: `foldAndOrOfICmpEqZeroAndICmp` must be made
    `static` to avoid multiply-defined symbol errors when linking against the
@@ -292,7 +292,7 @@ if (Ty->isVoidTy()) { builder.CreateRetVoid(); return; }
 
 ---
 
-### seahorn (LLVM 14 → 15)
+### seahorn (LLVM 14 -> 15)
 
 **Key reference commits** (all on the `dev15` branch of seahorn):
 
