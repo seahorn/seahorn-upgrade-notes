@@ -122,3 +122,29 @@ live consumers, closing the boundary finding.
 Remaining: CHC tail (HornifyModule-as-analysis, 6 solver-side consumers);
 sea-dsa ShadowMem new-PM port (lifts the last legacy pre-step); batch E
 (delete legacy tail + dead-legacy-class sweep, ~75 classes).
+
+## CHC tail kickoff (2026-07-08): gates + step 1
+
+[FACT] CHC QA gates: test-simple (10) + test-solve (6), both `sea pf` end to
+end (prefix → ShadowMem → HornifyModule → HornSolver). Baseline: simple 9/10,
+solve 5/6; the two failures (simple/05_recursive_sat, solve/04_unsat)
+REPRODUCE ON THE dev16 BASE — pre-existing, not branch-caused (A/B'd with a
+dev16 rebuild). Gate = "pass/fail set unchanged". pred-abs discovers ZERO
+tests (empty suite). Follow-up someday: did those two fail on dev15?
+
+[OBS] CHC step 1 (ce47a5a7): the whole LegacyOperationalSemantics family
+(UfoOpSem, MemUfoOpSem, FMapUfoOpSem, ClpOpSem) had Pass& ONLY for a ctor
+CanFail lookup (same as BvOpSem). Now ctor takes const CanFail*; creators:
+HornifyModule passes m_canFail, HornCex pulls CanFail itself. Family is now
+Pass-free constructible.
+
+Remaining CHC map (CHC-2): HornifyModule getter-ization (its own pulls:
+CanFail ifAvailable, ShadowMem+CompleteCallGraph ifAvailable under
+InterProcMem modes, CallGraph @314, per-F CutPointGraph @426 which is a
+scheduling-only discarded call) + HornifyModuleWrapper module analysis
+(needs ShadowMem handoff — register an external-object analysis capturing
+the pointer from the legacy pre-step) + consumers via runImpl(hm,...):
+HornWrite(hm), HornSolver(hm) (+its printCex paths getAnalysis sites @254,
+305), HornCex(hm, solver-result) — or explicit driver orchestration for the
+run-once tail (leaning explicit). Houdini/PredAbs/LoadCrab: legacy fallback
+via route predicate, like path-bmc.
