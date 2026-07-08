@@ -82,3 +82,25 @@ PredicateAbstraction do, all CHC-side) — so the BMC tail needs only these
 three + stock FAM analyses + NameValues + ShadowMem + optional GateAnalysis.
 Next (C2): BmcPassNew consuming via MAM, ShadowMem object handed from the
 legacy run (keep raw pass ptr), then the BMC path is fully new-PM.
+
+## Progress (2026-07-08, cont.): batch C2a + C2b — opsem seam + full analysis set
+
+[OBS] C2a (21d858c7): retired the Pass& seam in Bv2OpSem. Blast radius was
+tiny: 5 m_pass sites — ctor pulls (CanFail ifAvailable + a WRITE-ONLY
+m_tliWrapper, deleted), per-function LVI (now a std::function getter; the
+LVI cache stores LazyValueInfo* not the wrapper), clam-gated ShadowMem/TLI
+(compiled out on dev16; nullable Pass* + assert). Legacy ctor = adapter; new
+ctor takes CanFail* + LVI getter → FAM-ready. Gated opsem2/opsem/vcc 228/228.
+
+[OBS] C2b (1bed7079): runImpl in ControlDependenceAnalysisPass + GateAnalysisPass;
+ControlDependenceAnalysisWrapper + GateAnalysisWrapper module analyses (FAM
+proxy for per-F DT/PDT). The new-PM BmcPass analysis set is now COMPLETE:
+CanFail/TopoOrder/CutPointGraph/CDA/GateAnalysis + stock TLI/LVI/DT.
+
+[FACT] BmcPass consumption map (for C2c): GateAnalysis (main, if HornGSA),
+CutPointGraph(F), CanFail (ifAvailable → opsem), TLI(F) only for cex-gen,
+ShadowMem OBJECT only in the clam-stubbed path engine (dev16: dead) — but
+ShadowMem INSTRUMENTATION must still run before BMC (legacy pre-step is fine;
+BmcPassNew need not require the pass). Next (C2c): BmcPass::runImpl over
+getters + BmcPassNew + driver BMC route = legacy{SeaBuiltins,ShadowMem} →
+MPM{UnifyAssumes?, CanReadUndef, EvalBranchSentinel?, NameValues, BmcPassNew}.
