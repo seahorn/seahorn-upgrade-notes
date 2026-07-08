@@ -104,3 +104,21 @@ ShadowMem INSTRUMENTATION must still run before BMC (legacy pre-step is fine;
 BmcPassNew need not require the pass). Next (C2c): BmcPass::runImpl over
 getters + BmcPassNew + driver BMC route = legacy{SeaBuiltins,ShadowMem} →
 MPM{UnifyAssumes?, CanReadUndef, EvalBranchSentinel?, NameValues, BmcPassNew}.
+
+## MILESTONE (2026-07-08): mono BMC runs through the new PM (batch C2c)
+
+[OBS] C2c (c899734e): BmcPass refactored onto std::function analysis getters
++ shared processModule; BmcPassNew wires them from MAM/FAM (CanFailAnalysis,
+CutPointGraphAnalysis, GateAnalysisWrapper, stock TLI/LVI); opsems built via
+the explicit-analyses ctors (BvOpSem v1 mini-seam: its Pass& was ctor-only).
+Driver: mono-BMC (no --oll/--mem-dot) = legacy{SeaBuiltins, ShadowMem} →
+MPM{UnifyAssumes?, CanReadUndef, EvalBranchSentinel?, NameValues, BmcPassNew}.
+Path engine + dump flows fall back to the untouched legacy tail.
+
+[OBS] Gates all green THROUGH THE NEW ROUTE: opsem2 42/42, opsem 125+1,
+verify-c-common 228/228. Batch B's ports (UnifyAssumesNewPass etc.) are now
+live consumers, closing the boundary finding.
+
+Remaining: CHC tail (HornifyModule-as-analysis, 6 solver-side consumers);
+sea-dsa ShadowMem new-PM port (lifts the last legacy pre-step); batch E
+(delete legacy tail + dead-legacy-class sweep, ~75 classes).
