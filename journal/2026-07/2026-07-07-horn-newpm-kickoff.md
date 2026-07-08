@@ -169,3 +169,31 @@ owned stateless SeaBuiltinsInfo; the m_smp fetch was write-only and dropped.
 new route; opsem2 42/42; opsem 125+1; vcc 228/228. Both pipelines (BMC and
 CHC) now run on the new PM. Remaining for batch E: Cex flow, sea-dsa
 ShadowMem port, legacy-tail deletion + dead-class sweep.
+
+## Batch E underway (2026-07-08): E1 dead-file deletion; E2 worklist
+
+[OBS] E1 (fb72b50c): -999 lines. Deleted zero-consumer legacy pass files:
+ApiAnalysisPass, CanAccessMemory, BufferBoundsCheck trio (NOT the live
+FatBufferBoundsCheck), LoopUnhoist, WeakTopologicalOrderPass (pass only —
+the header-only WTO used by HornClauseDBWto stays!), StaticTaint. Audit
+method: factory CALLS (declarations excluded, namespace-qualified `new`
+included) + addRequired/getAnalysis refs across lib/tools/units. Gates:
+opsem2 42/42, opsem 125+1, simple/solve baseline.
+
+[OBS] E2 worklist — 37 more zero-consumer LEGACY WRAPPERS inside files
+shared with new-PM twins (delete wrapper class + factory + INITIALIZE +
+Passes.hh decl; keep runImpl/new-PM code): AbstractMemory, CHAPass,
+DebugVerifier, DevirtualizeFunctions, DummyExitBlock, DummyMainFunction,
+EnumVerifierCalls, ExternalizeAddressTakenFunctions, ExternalizeFunctions,
+GeneratePartialFn, KillUnusedNondet, KillVarArgFn, KleeInternalize,
+LowerArithIntrinsics, LowerAssert, LowerCstExpr, LowerGvInitializers,
+MarkFnEntry, MarkInternalConstructOrDestructInline, MixedSemantics,
+NondetInit, NullCheck, OneAssumePerBlock, PromoteBoolLoads, PromoteMalloc,
+PromoteMemcpy, PromoteSeahornAssume, ReduceToReturnPaths, RenameNondet,
+SimplifyPointerLoops, SliceFunctions, StripLifetime,
+StripUselessDeclarations, SymbolizeConstantLoopBounds, UnfoldLoopForDsa,
+WrapMem (+LowerIsDeref-family recheck). Caveats: initializeXPass calls in
+seapp.cc/seahorn.cpp Registry blocks must go too (link errors are the
+auditor); INITIALIZE_PASS_DEPENDENCY of retained passes may pin some.
+After E2: the driver's legacy-tail deletion still awaits HornCex +
+sea-dsa ShadowMem ports.
