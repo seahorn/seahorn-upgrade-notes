@@ -148,3 +148,24 @@ HornWrite(hm), HornSolver(hm) (+its printCex paths getAnalysis sites @254,
 305), HornCex(hm, solver-result) — or explicit driver orchestration for the
 run-once tail (leaning explicit). Houdini/PredAbs/LoadCrab: legacy fallback
 via route predicate, like path-bmc.
+
+## MILESTONE (2026-07-08): CHC tail on the new PM (CHC-2)
+
+[OBS] CHC-2 (710ac614): HornifyModule split (legacy wiring / shared
+processModule + cpg/cg getters + setCanFail); HornWrite/HornSolver runImpl;
+driver routes plain pf/smt through the shared MPM then EXPLICIT orchestration
+(hornify → write → solve as plain objects — the kickoff's "run-once tail
+needs no PM" option, realized). Fallback to legacy tail for Cex, Houdini,
+PredAbs, Crab, MemDot, --oll, inter-proc-mem (exported hornInterMemEnabled).
+
+[FACT] Standalone-object hazard: Pass-CONDUIT ACCESSORS (methods on a legacy
+pass that call getAnalysis for callers, e.g. HornifyModule::getSBI,
+HornifyFunction's m_smp ctor fetch) segfault on a standalone object (null
+resolver). Grep 'getAnalysis' in the class HEADER, not just runOnModule,
+before instantiating any legacy pass outside a PM. getSBI now returns an
+owned stateless SeaBuiltinsInfo; the m_smp fetch was write-only and dropped.
+
+[OBS] Gates: simple 9/10 + solve 5/6 IDENTICAL to dev16 baseline through the
+new route; opsem2 42/42; opsem 125+1; vcc 228/228. Both pipelines (BMC and
+CHC) now run on the new PM. Remaining for batch E: Cex flow, sea-dsa
+ShadowMem port, legacy-tail deletion + dead-class sweep.
