@@ -45,3 +45,16 @@ E. delete legacy PM from seahorn.cpp; then the dead-legacy-class sweep
 
 opsem/opsem2/vcc all exercise the `seahorn` binary (the horn stage), so each
 batch gets the full existing gates — same rhythm as the seapp migration.
+
+## Progress (2026-07-08): transform prefix fully migrated
+
+[OBS] Batches A1-A4 on `dev16-horn-newpm` (6daf6307, 2a538b7f, ab0cc662,
+b5ce654e), each gated opsem2 42/42 + opsem 125+1; A2-A4 also vcc 228/228
+(391-404s). The ENTIRE transform prefix now runs through the driver MPM;
+ported en route with the shared-runImpl pattern: GeneratePartialFn,
+StripLifetime, OneAssumePerBlock. Legacy inliner → ModuleInlinerWrapperPass
+(gated clean). Legacy PM remaining: SeaBuiltinsWrapper → ShadowMem →
+UnifyAssumes? → CanReadUndef → EvalBranchSentinel? → horn tail.
+Next: batch B = ShadowMem boundary (sea-dsa new-PM face) + UnifyAssumes port
+(needs DT/AC via FAM proxy for its final PromoteMemToReg) + CanReadUndef
+(twin exists); then HornifyModule-as-ModuleAnalysis (batch C/D).
