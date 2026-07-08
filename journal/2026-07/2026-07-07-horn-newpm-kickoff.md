@@ -58,3 +58,27 @@ UnifyAssumes? → CanReadUndef → EvalBranchSentinel? → horn tail.
 Next: batch B = ShadowMem boundary (sea-dsa new-PM face) + UnifyAssumes port
 (needs DT/AC via FAM proxy for its final PromoteMemToReg) + CanReadUndef
 (twin exists); then HornifyModule-as-ModuleAnalysis (batch C/D).
+
+## Progress (2026-07-08, cont.): batches B + C1
+
+[OBS] Batch B (29c07677): UnifyAssumes ported with LAZY DT/AC getters (legacy
+fetched them AFTER mutating, for the final PromoteMemToReg — pre-fetching via
+FAM would hand mem2reg a stale domtree); EvalBranchSentinel ported (function
+wrapper, explicit SBI). vcc 228/228.
+
+[FACT] The ShadowMem slice CANNOT interleave out of the tail legacy PM:
+BmcPass and HornifyModule addRequired<ShadowMemPass>, so ShadowMem must be
+scheduled in the same legacy manager as its consumers (a sandwich attempt
+crashed legacy schedulePass; reverted, re-gated green). The whole
+ShadowMem..EvalBranchSentinel slice moves only when the tail consumes shadow
+memory via an analysis.
+
+[OBS] Batch C1 (f4c66797): first seahorn new-PM analyses — CanFailAnalysis
+(CallGraph from MAM), TopologicalOrderAnalysis, CutPointGraphAnalysis
+(composes over TopologicalOrderAnalysis via FAM), DsaInfoAnalysis idiom
+(Result = unique_ptr<legacy state-holder> + runImpl). KEY: BmcPass does NOT
+consume HornifyModule (only HornCex/HornSolver/HornWrite/Houdini/LoadCrab/
+PredicateAbstraction do, all CHC-side) — so the BMC tail needs only these
+three + stock FAM analyses + NameValues + ShadowMem + optional GateAnalysis.
+Next (C2): BmcPassNew consuming via MAM, ShadowMem object handed from the
+legacy run (keep raw pass ptr), then the BMC path is fully new-PM.
