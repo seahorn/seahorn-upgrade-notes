@@ -37,6 +37,42 @@ local `npx commitlint` does NOT reproduce this — don't trust a clean local run
 Never put `#NNN` (e.g. `seahorn#581`) in a commit body; write `issue 581` or a
 full URL. Headers ≤72 chars.
 
+[FACT] **commitlint full rule set (verified on PR 586, 2026-07-07).** The old
+action enforces: header ≤ **72** chars (not config-conventional's modern 100);
+**subject must start lowercase** (`subject-case` rejects sentence-case — so
+`refactor(seapp): SimpleMemoryCheck consumes …` fails; reword to
+`use the cached … in SimpleMemoryCheck`); body lines ≤ 100. Local pre-push
+audit that matches CI: check `%s` length, first-subject-char case, and body
+line lengths over `origin/<base>..HEAD` — 15/35 dev16 commits failed on first
+push. Bulk fix: `git filter-branch -f --msg-filter` with a header-mapping
+script (bodies untouched), then force-with-lease.
+
+[FACT] **clang-format CI** (`check-formatting.yml`): the check is
+`git diff <base> -U0 -- '**/*.cpp' '**/*.cc' '**/*.h' '**/*.hh' |
+clang-format-diff-15 -p1` must output nothing — i.e. only the PR's *changed
+lines* must be clang-format-15-clean, with **clang-format-15 specifically**
+(other versions format differently; `/usr/bin/clang-format-diff-15` exists
+locally). Fix = same command with `-i`, run to a fixpoint (a second pass can
+expose new reflow), rebuild, commit as `style: …`.
+
+[FACT] **The sea driver hardcodes the clang version it searches** —
+`py/sea/commands.py` `which(['clang-mp-<N>', 'clang-<N>', 'clang'])` (plus
+`llvm-link-<N>`). Two consequences on dev16 (found via PR 586 CI, 2026-07-07):
+(1) in the jammy-llvm16 container, the stale clang-15 list made every source
+(.c) flow die with "clang not found" — .ll-based suites (opsem) pass while
+.c-based ones (opsem2/mcfuzz/smc/cex) fail wholesale, a distinctive signature;
+(2) locally, host `/usr/bin/clang-15` matched the old list, so ALL local
+validation had silently used a clang-15 front end while seahorn itself was
+built with LLVM 16. After fixing the list to clang-16, local lit runs need
+`clang-16`/`llvm-link-16` on lit's PATH (lit only prepends `run/bin`; symlink
+the toolchain binaries into `build-dev16/run/bin`). Re-validated with the
+clang-16 front end: opsem2 42/42, opsem 125+1, vcc 228/228 (405s).
+
+[FACT] **clang-16 makes implicit function declarations a hard error** (C99+):
+tests calling `memset` etc. without `<string.h>` fail to COMPILE on dev16
+(e.g. opsem2 `ownsem/unique_unsat.02.c`). Sweep pattern: grep mem*/str* users
+without the include across all CI-run suites.
+
 ## Why this matters
 
 None of these are discoverable from the code; each produces a confusing failure

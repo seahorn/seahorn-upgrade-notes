@@ -2,21 +2,26 @@
 
 Backlog of started-but-not-pursued threads. Five-field format per entry.
 
-## llvm-seahorn origin/dev16: pristine reset vs. preserve shared work
-**Status:** parked 2026-06-30
-**Context:** Asked to create a "pristine" `seahorn/llvm-seahorn:dev16` from
-   `dev15` (mirroring the sea-dsa workflow). But unlike sea-dsa, `origin/dev16`
-   on the shared seahorn org ALREADY exists with 17 commits of real LLVM-16
-   port work (SeaInstCombine, FakeLatchExit, loop-extract, new-PM passes). Only
-   `7748ee1` differs from local `dev16`, and its content is already folded into
-   the squashed `fa74927`. So a reset-to-dev15 would discard shared upstream work.
-**Why parked:** Destructive on a shared repo + contradicts how it was described
-   ("pristine" implies empty); needs a human decision, not an autonomous force-push.
-**To resume:** Confirm intent. Likely the right action is NOT reset-to-dev15 but
-   a force-with-lease of local `fa74927` over `origin/dev16` (same safe squash
-   already pushed to `priyasiddharth/dev16`). Verify no PR is backed by the branch.
-**Effort estimate:** ~10 min once intent confirmed.
-**References:** durable/multi-llvm-version-branch-structure.md
+(Resolved 2026-06-30: "why does dev15 keep the loop but dev16 fold it" — root cause
+was a lost `--seaopt-enable-indvar=false` flag, not a pass-behavior difference;
+LLVM-15 and LLVM-16 IndVarSimplify fold identically. Captured in
+durable/seaopt-O-pipeline.md + journal/2026-06/2026-06-30-indvars-root-cause.md.)
+
+(Resolved 2026-07-03: llvm-seahorn origin/dev16 — user directed the push;
+force-with-lease of local dev16 (`8e7e6c6`: squash `fa74927` + realign/indvar
+flag) over origin's `7748ee1`, exactly the action the parked note anticipated
+(NOT reset-to-dev15). Verified first: `7748ee1`'s content fully contained in
+the squash (NewPMDriver superseded; README byte-identical). local == origin ==
+`8e7e6c6`. Note: `priyasiddharth/dev16` fork is now behind origin.)
+
+(Resolved 2026-07-03: "enable IndVarSimplify for BMC flows" — implemented as
+`--seaopt-enable-indvar` in seaopt (default off, gates LPM2) +
+`Seaopt(enable_indvar=True)` on the bounded sea aliases
+(`bpf`/`fpf`/`bnd-*`/`fpcf`/`spf`) via a dedicated `BndFeCmds` list. Validated:
+opsem2 42/42, opsem 125, vcc 228/228 (vcc runs fpf → indvars exercised).
+Uncommitted. Captured in
+journal/2026-07/2026-07-03-indvar-tied-to-bounded-flows.md +
+durable/seaopt-O-pipeline.md.)
 
 ## clam: malloc/free not recognized at -O0 on LLVM 15
 **Status:** parked (carried over from dev15 work)
@@ -29,3 +34,26 @@ Backlog of started-but-not-pursued threads. Five-field format per entry.
    read the `allockind` attribute rather than the older marking.
 **Effort estimate:** unknown (~half-day once clam build is up on 16).
 **References:** durable/seahorn-build-and-ci-gotchas.md
+
+## opsem imprecision: partially-uninitialized bitfield structs (mcfuzz issue_44)
+**Status:** parked 2026-07-08 (test disabled: test/mcfuzz/issue_44.c.disabled)
+**Context:** Correct verdict is unsat. Reasoning: i.a = 2 is a load-modify-write
+   that concretely sets the LOW 16 bits of the bitfield's storage unit; undef
+   occupies only the never-written high bits and .b, which do not flow into the
+   i.a != 2 comparison; by-value copies preserve written bits, so the error is
+   unreachable. Corroborated by LLVM -O3 folding the branch away (a sat verdict
+   would make that a miscompile) and by MCFuzz's differential report adjudicating
+   SeaHorn's sat as the false alarm. A sat verdict requires losing WRITTEN
+   sub-word bits while copying a partially-undef storage unit -- imprecision,
+   not a defensible model of uninitialized memory. (File is seahorn-local
+   issue_44.c, derived from MCFuzz upstream tracker issue 46.) Both
+   bv-opsems historically gave spurious sat (hence XFAIL); on dev16 the verdict
+   is ENVIRONMENT-DEPENDENT (unsat in local jammy-llvm16 container, fail on the
+   CI runner) — likely sub-word undef propagation during aggregate copies in
+   BvOpSem2's memory model. XFAIL/pass/UNSUPPORTED/REQUIRES all unstable across
+   lit versions (pip lit reports unmet REQUIRES as UNRESOLVED), so the file is
+   renamed out of lit discovery.
+**To resume:** fix low-16-bit preservation across struct copies with undef high
+   bits; re-enable by renaming back; verdict must be unsat in ALL 4 RUN configs.
+**Effort estimate:** ~1-2 days (opsem memory model).
+**References:** journal/2026-07/2026-07-07-pr586-and-ci-fixes.md

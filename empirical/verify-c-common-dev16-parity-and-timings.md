@@ -2,7 +2,9 @@
 
 **Verified against:** seahorn dev16 + llvm-seahorn `fa74927` + sea-dsa `4c19864`,
 LLVM 16.0.4 prebuilt toolchain
-**Last verified:** 2026-06-30
+**Last verified:** 2026-07-07 (228/228 in 405s wall, clang-16 front end via the
+fixed sea driver — earlier runs were silently front-ended by host clang-15 —
+with indvars-on bounded flows; consistent with the 2026-07-03 413s run)
 **Status:** wide-eval-confirmed (full 228-test suite, exit 0)
 
 [EMP] dev16 verify-c-common is at **228/228** — full parity with the dev15

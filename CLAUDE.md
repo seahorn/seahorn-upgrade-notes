@@ -47,9 +47,12 @@ Use ctest at `~/cmake-3.31.7-linux-x86_64/bin/ctest` (NOT the pip shim).
 
 See `loose-ends/parked.md`. Quick view:
 
-- llvm-seahorn `origin/dev16` force-push decision (paused — would erase 17
-  shared commits; needs human call)
+- clam malloc/free detection on LLVM 16 (carried over; clam compiled out)
+- (resolved 07-03/07-06) indvars-for-BMC + avoid-bv-off-for-BMC: llvm-seahorn
+  `8e7e6c6` (pushed to origin/dev16); seahorn `7dc45541` + `419bc407`
+  (committed, not pushed)
 
 ## Last weekly digest
 
-(none yet — first week)
+weekly/2026-W27.md (2026-06-27 → 2026-07-01: dev16 parity reached; seaopt -O#
+root causes; BMC supported mode = df + coi + unify-assumes + gsa)

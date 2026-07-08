@@ -1,5 +1,11 @@
 # Full stock O3 flips a bounded-loop proof unsat→sat
 
+[SUPERSEDED → ../2026-06/2026-06-30-indvars-root-cause.md] The "soundness" framing
+below is WRONG. The flip is sound (`sat` is the true verdict); the single cause is
+`IndVarSimplify` exit-value rewriting, and the dev16 regression was a lost
+`--seaopt-enable-indvar` flag — not full-O3 aggression. Kept for the trail; read
+the 2026-06-30 entry + durable/seaopt-O-pipeline.md for the corrected account.
+
 [OBS 2026-06-29] Two different ways of giving seaopt the *genuine* LLVM-16 O3
 pipeline (to fix the push_back slowdown) both fix push_back AND both break opsem2
 `verifier_assert_unsat.03` (unsat → **sat**):
