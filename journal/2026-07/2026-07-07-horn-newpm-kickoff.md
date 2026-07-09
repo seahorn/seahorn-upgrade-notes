@@ -223,3 +223,29 @@ remains BY DESIGN as the fallback for Boogie, Crab, --mem-dot, path-bmc and
 inter-proc-mem (mostly clam-gated). The legacy pass-library surface is
 retained per the user's scope principle. Optional future work (not debt):
 sea-dsa ShadowMem new-PM port would lift the last legacy pre-step.
+
+## ShadowMem ported (2026-07-09): the last legacy pre-step lifted
+
+[OBS] sea-dsa 6cce37f + seahorn 8a034427: ShadowMemNewPmPass added ALONGSIDE
+the legacy ShadowMemPass (wrapper symmetry per the user's design principle);
+shared ShadowMemImpl now takes DT/AC getters; AllocSiteInfoAnalysis +
+DsaInfoAnalysis GlobalAnalysis accessor + shared mkTLIGetter(M,MAM).
+EQUIVALENCE PROVEN: sea smt horn output byte-identical legacy vs new route.
+Gates: opsem2 42/42, opsem 125+1, simple/solve/cex baseline, vcc 228/228.
+
+[FACT] Two bugs the gates caught:
+1. FAM-cached DominatorTree goes STALE when an impl interleaves CFG mutation
+   with repeated queries (legacy getAnalysis recomputed fresh every call) →
+   PromoteMemToReg segfault. Cure: getters that BUILD a fresh DT/AC per
+   query. Third variant of the analysis-staleness hazard (UnifyAssumes =
+   lazy-once; conduit accessors = null resolver; ShadowMem = fresh-per-query).
+2. Since CHC-2 the legacy HornifyModule/HornWrite adds were never
+   route-guarded: the CHC route hornified TWICE and wrote horn output twice —
+   masked while legacy ShadowMem ran first, exposed when instrumentation
+   moved into the MPM. Lesson: after adding an explicit route, grep the
+   legacy tail for EVERY add it supersedes; byte-diff the outputs
+   (sea smt -o) between routes, not just verdicts.
+
+The new routes now run ENTIRELY on the new PM, ShadowMem included. Legacy
+tail remains only for Boogie/Crab/--mem-dot/path-bmc/inter-proc-mem, and the
+legacy pass surface stays by design.
