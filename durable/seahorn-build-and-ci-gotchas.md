@@ -47,6 +47,10 @@ line lengths over `origin/<base>..HEAD` — 15/35 dev16 commits failed on first
 push. Bulk fix: `git filter-branch -f --msg-filter` with a header-mapping
 script (bodies untouched), then force-with-lease.
 
+[FACT] **git's default revert message fails commitlint**: `Revert "..."` has
+no conventional-commit type and an uppercase subject. Always reword reverts on
+this repo, e.g. `revert(scope): restore ...` (≤72, lowercase).
+
 [FACT] **clang-format CI** (`check-formatting.yml`): the check is
 `git diff <base> -U0 -- '**/*.cpp' '**/*.cc' '**/*.h' '**/*.hh' |
 clang-format-diff-15 -p1` must output nothing — i.e. only the PR's *changed
