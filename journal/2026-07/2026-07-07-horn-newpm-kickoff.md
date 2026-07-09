@@ -249,3 +249,12 @@ Gates: opsem2 42/42, opsem 125+1, simple/solve/cex baseline, vcc 228/228.
 The new routes now run ENTIRELY on the new PM, ShadowMem included. Legacy
 tail remains only for Boogie/Crab/--mem-dot/path-bmc/inter-proc-mem, and the
 legacy pass surface stays by design.
+
+## Perf A/B (2026-07-09): new PM == legacy PM on runtime
+
+[EMP] Direct A/B, dev16-base (all-legacy) binary vs branch head: BMC single
+module x5 150 vs 149ms; opsem2 suite 2.2s both; CHC encode-only x20 304 vs
+301ms. No measurable difference — same passes, same order, PM bookkeeping is
+noise vs pass/solver work. (CHC suite wall is NOT a usable signal: the two
+known-failing tests' z3 time swings 28-80s.) Binary +1MB (both PM surfaces
+compiled in — the additive design's only cost).
