@@ -197,3 +197,15 @@ seapp.cc/seahorn.cpp Registry blocks must go too (link errors are the
 auditor); INITIALIZE_PASS_DEPENDENCY of retained passes may pin some.
 After E2: the driver's legacy-tail deletion still awaits HornCex +
 sea-dsa ShadowMem ports.
+
+## SCOPE CORRECTION (2026-07-08, user): no legacy-class deletion
+
+[FACT] User reframing: the legacy pass wrapper classes existed in dev14 and
+dev15 — they are a DESIGN CHOICE (an available pass-library surface), not
+new-PM-migration debris. The migration must stay ADDITIVE: new-PM routes and
+seams, but no removal of the legacy pass surface. Consequences: batch E2
+(37-wrapper sweep) CANCELLED; batch E1's whole-file deletion REVERTED
+(108f613e reverts fb72b50c). This also re-answers the PR-review "+lines >>
+-lines, did we forget to delete?" question: the retained wrappers are
+intentional, and the honest asymmetry story is "new-PM surface added
+alongside a deliberately kept legacy library".
