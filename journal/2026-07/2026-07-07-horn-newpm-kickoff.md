@@ -209,3 +209,17 @@ seams, but no removal of the legacy pass surface. Consequences: batch E2
 -lines, did we forget to delete?" question: the retained wrappers are
 intentional, and the honest asymmetry story is "new-PM surface added
 alongside a deliberately kept legacy library".
+
+## COMPLETE (2026-07-08): the horn-newpm migration, final state
+
+[OBS] Final commits: 72951e4a (Cex/Houdini/PredAbs on the new route; cex 5/5,
+vcc 228/228), 108f613e (E1 reverted per the scope correction), a3efc9eb
+(--oll dumps in the route MPM). Branch dev16-horn-newpm: 17 commits, every
+one suite-gated.
+
+[FACT] End state: transform prefix, mono BMC, CHC (hornify/write/solve/cex/
+houdini/pred-abs) and --oll all run on the new PM. The driver's legacy tail
+remains BY DESIGN as the fallback for Boogie, Crab, --mem-dot, path-bmc and
+inter-proc-mem (mostly clam-gated). The legacy pass-library surface is
+retained per the user's scope principle. Optional future work (not debt):
+sea-dsa ShadowMem new-PM port would lift the last legacy pre-step.

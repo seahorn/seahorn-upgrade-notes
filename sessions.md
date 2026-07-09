@@ -3,6 +3,27 @@
 Curated index of significant sessions. Newest first. Add an entry only when a
 session produced notes, code, or decisions worth pointing back to.
 
+## 2026-07-08 (horn-newpm arc)
+**Session:** horn/BMC + CHC new-PM migration, kickoff to completion
+**Theme:** Migrated the seahorn driver to the new PassManager in 17 gated
+   commits on `dev16-horn-newpm`: transform prefix (A1-A4), opsem Pass-seam
+   retirements (Bv2OpSem, BvOpSem, UfoOpSem family — all ctor-only CanFail
+   pulls), five seahorn new-PM analyses, BmcPassNew (mono BMC end to end),
+   explicit CHC orchestration (hornify/write/solve/cex/houdini/pred-abs),
+   --oll dumps. Every batch gated on opsem2/opsem (+vcc 228/228 for the big
+   ones; CHC on baseline-locked simple/solve: 2 pre-existing dev16 failures).
+**Critical corrections (user):**
+- "the wrappers were there in dev14/dev15 — a design choice, don't change
+  it": cancelled the dead-class deletion sweep (E2) and REVERTED the E1 file
+  deletion; the migration stays additive; the retained legacy pass library
+  is intentional, which also re-answers the PR +/- asymmetry question.
+**Key findings:** Pass-conduit accessors segfault standalone (getSBI);
+   ShadowMem pinned to its consumers' PM (addRequired); UnifyAssumes needs
+   lazy DT/AC; CHC baseline failures (simple/05, solve/04) pre-exist dev16.
+**Status:** task complete; branch local-only, 17 commits, ready to push/PR.
+**Next-session pickup:** optional sea-dsa ShadowMem new-PM port; the two
+   pre-existing CHC failures; PR sequencing after seahorn#586 merges.
+
 ## 2026-07-07
 **Session:** seahorn dev16 rebased onto current dev15; PR branches finalized
 **Theme:** The dev16→origin PR showed ~22 llvm15-titled commits: dev16 forked
