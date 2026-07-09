@@ -16,7 +16,11 @@ session produced notes, code, or decisions worth pointing back to.
    top (tip ede7a3ea, 17 commits, tree byte-identical, clean-FF PR ready).
    sea-dsa fork realigned to origin lineage (2d264d8) after a twin-commit
    merge conflict — same disease, same cure as the llvm15 episode.
-**Status:** everything upstream-able is clean; horn-newpm PR is the next act.
+**Status (updated 2026-07-09):** **PR 587 (new-PM migration) CI GREEN** and
+   mergeable — sea-dsa's ShadowMem commit merged upstream first (384c63e,
+   re-rebased SHAs again), then a cosmetic amend restarted CI (f2f98179).
+   Both dev16 arcs — the LLVM-16 port (#586) and the new-PM migration
+   (#587) — are now upstream or upstream-ready.
 **Next-session pickup:** open the horn-newpm PR; sea-dsa 2d264d8 → origin;
    check origin/copilot/fix-lint-failure branch (unreviewed automation?);
    formats artifacts still undecided; simple/05 + solve/04 investigation.
