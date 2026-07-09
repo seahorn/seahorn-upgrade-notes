@@ -3,6 +3,24 @@
 Curated index of significant sessions. Newest first. Add an entry only when a
 session produced notes, code, or decisions worth pointing back to.
 
+## 2026-07-09
+**Session:** ShadowMem new-PM port; PM perf A/B; PR 586 MERGED; lineage syncs
+**Theme:** Ported ShadowMem to the new PM with wrapper symmetry (sea-dsa
+   `2d264d8`: ShadowMemNewPmPass beside the legacy pass, DT/AC getters with
+   FRESH-per-query trees, AllocSiteInfoAnalysis); seahorn `8a034427` wires it
+   + fixes a latent double-hornify. Route equivalence PROVEN byte-identical
+   (sea smt). Perf A/B: new PM == legacy PM (150 vs 149ms module, 2.2s suite,
+   304 vs 301ms encode-only); binary +1MB (additive design).
+**Milestone:** **seahorn PR 586 merged upstream** (origin/dev16 = 7c8a8f40,
+   rebased twins). Local dev16 reset to origin; dev16-horn-newpm rebased on
+   top (tip ede7a3ea, 17 commits, tree byte-identical, clean-FF PR ready).
+   sea-dsa fork realigned to origin lineage (2d264d8) after a twin-commit
+   merge conflict — same disease, same cure as the llvm15 episode.
+**Status:** everything upstream-able is clean; horn-newpm PR is the next act.
+**Next-session pickup:** open the horn-newpm PR; sea-dsa 2d264d8 → origin;
+   check origin/copilot/fix-lint-failure branch (unreviewed automation?);
+   formats artifacts still undecided; simple/05 + solve/04 investigation.
+
 ## 2026-07-08 (horn-newpm arc)
 **Session:** horn/BMC + CHC new-PM migration, kickoff to completion
 **Theme:** Migrated the seahorn driver to the new PassManager in 17 gated
