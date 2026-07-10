@@ -47,6 +47,14 @@ line lengths over `origin/<base>..HEAD` — 15/35 dev16 commits failed on first
 push. Bulk fix: `git filter-branch -f --msg-filter` with a header-mapping
 script (bodies untouched), then force-with-lease.
 
+[FACT] **Cross-repo PRs: merge the dependency repo FIRST.** seahorn's CI
+clones sea-dsa/llvm-seahorn BY BRANCH (`CMakeLists.txt` `extra` target,
+`-b dev16` from the seahorn org), never from a fork. A seahorn PR using a new
+sea-dsa API fails its build until that sea-dsa commit is on
+`seahorn/sea-dsa:dev16` (bit PR 587: `ShadowMemNewPmPass` unresolved). Also:
+every merge to the org repos re-writes SHAs (rebased twins), so reference
+dependencies by content/branch, not SHA.
+
 [FACT] **git's default revert message fails commitlint**: `Revert "..."` has
 no conventional-commit type and an uppercase subject. Always reword reverts on
 this repo, e.g. `revert(scope): restore ...` (≤72, lowercase).

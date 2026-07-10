@@ -21,7 +21,14 @@ session produced notes, code, or decisions worth pointing back to.
    re-rebased SHAs again), then a cosmetic amend restarted CI (f2f98179).
    Both dev16 arcs — the LLVM-16 port (#586) and the new-PM migration
    (#587) — are now upstream or upstream-ready.
-**Next-session pickup:** open the horn-newpm PR; sea-dsa 2d264d8 → origin;
+**PR 587 trail:** opened from fork:dev16 (message rewritten for outside
+   reviewers per user ask). CI round 1: lint+format FAILED → 657-line
+   clang-format fixpoint (style commit) + 3 header rewords via filter-branch
+   (incl. git's default Revert header — no type, uppercase). Round 2: test
+   FAILED — sea-dsa dependency missing on org branch (CI clones by branch);
+   user merged sea-dsa dev16, cosmetic amend restarted CI → ALL GREEN.
+**Next-session pickup:** merge PR 587; delete backup branches
+   (dev16-pre-rebase/-pre-reorder/-pre-sync, horn-newpm-pre-sync);
    check origin/copilot/fix-lint-failure branch (unreviewed automation?);
    formats artifacts still undecided; simple/05 + solve/04 investigation.
 
