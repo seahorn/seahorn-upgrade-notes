@@ -23,6 +23,26 @@ Uncommitted. Captured in
 journal/2026-07/2026-07-03-indvar-tied-to-bounded-flows.md +
 durable/seaopt-O-pipeline.md.)
 
+## SimplifyPointerLoops: pointer-IV detection disabled (needs opaque-ptr port)
+**Status:** parked 2026-07-14 (user flagged: might still be important — file a
+   GitHub issue on seahorn/seahorn; draft ready at the session tmp
+   issue-simplify-pointer-loops.md, gh token was stale at the time)
+**Context:** the dev17 port made `isPointerInductionVariable` bail out
+   unconditionally: LLVM 17 removed `Type::getPointerElementType`, which the
+   pass used for element size (SCEV byte-step -> element stride). No observable
+   change: under opaque pointers (default since 15/16) the old code asserted at
+   the same spot, so seapp `--simplify-pointer-loops` has been broken since the
+   LLVM 15 era. The pass rewrites strided pointer loops into index loops —
+   valuable preprocessing for verification back-ends.
+**To resume:** recover the element type from the IV's increment GEP
+   (`getSourceElementType()` of the latch GEP, as LLVM's own loop passes do
+   under opaque pointers) or from access types at the IV's load/store sites;
+   the deleted stride logic is at the dev16 branch tip of
+   lib/Transforms/Scalar/SimplifyPointerLoops.cc.
+**Effort estimate:** ~0.5-1 day + a lit test that the rewrite fires.
+**References:** journal/2026-07 (dev17 seahorn port); seahorn PR #588 commit
+   `fix(llvm17): port sources to LLVM 17 API removals`.
+
 ## clam: malloc/free not recognized at -O0 on LLVM 15
 **Status:** parked (carried over from dev15 work)
 **Context:** clam does not recognize malloc/free at -O0 on LLVM 15 — the
