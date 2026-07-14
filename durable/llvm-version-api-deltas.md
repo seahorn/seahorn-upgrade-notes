@@ -29,6 +29,9 @@ log, NOT blanket seds (see llvm-seahorn-upstream-rebase-strategy.md for why).
 - CMake: `find_package(LLVM 16)` + `CMAKE_CXX_STANDARD 17` (was 14).
 
 [FACT] **16 → 17** (tiny):
+- CONFIRMED for sea-dsa (2026-07-09): the port shipped as exactly the first two
+  bullets + the find_package bump — clean build vs 17.0.6, nothing new appeared;
+  all gates baseline-locked vs dev16 (see journal 2026-07-09-seadsa-dev17-port).
 - `llvm/ADT/Optional.h` REMOVED → replace include with `<optional>`.
 - one missing direct `#include <set>` (was transitive) in CompleteCallGraph.hh.
 - TargetParser reorg: `llvm/ADT/Triple.h`, `llvm/MC/SubtargetFeature.h`,

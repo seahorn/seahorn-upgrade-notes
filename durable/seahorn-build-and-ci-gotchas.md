@@ -85,6 +85,18 @@ tests calling `memset` etc. without `<string.h>` fail to COMPILE on dev16
 (e.g. opsem2 `ownsem/unique_unsat.02.c`). Sweep pattern: grep mem*/str* users
 without the include across all CI-run suites.
 
+[FACT] **sea-dsa lit suite needs pygraphviz; dot-diffing is a dead end**
+(found 2026-07-09). The suite's graph checks run `tests/check_graphs.py`
+(networkx labeled isomorphism); without `pygraphviz` the checker crashes
+(exit 2) and ~46/52 tests "fail" on ANY binary — install with
+`pip install --user --break-system-packages pygraphviz` to get real results
+(true baseline: 22 pre-existing failures, identical dev16 == dev17, plus 1
+pre-existing units_sea_dsa failure `FirstPrimT.LL_reverse`). Do NOT byte-diff
+seadsa `.mem.dot` outputs across binaries or runs: node IDs are heap addresses
+AND emission order is unstable (same binary, two runs differ even after
+address normalization). `check_graphs.py <a> <b> both` is the gate. Run lit
+directly: `SEADSA=<build>/bin/seadsa lit -s --param test_dir=<build>/tests tests`.
+
 ## Why this matters
 
 None of these are discoverable from the code; each produces a confusing failure

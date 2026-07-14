@@ -3,6 +3,27 @@
 Curated index of significant sessions. Newest first. Add an entry only when a
 session produced notes, code, or decisions worth pointing back to.
 
+## 2026-07-09 (dev17 kickoff, saved 07-14)
+**Session:** sea-dsa dev17: fresh branch cut + LLVM-17 port, all gates locked
+**Theme:** First dev17 work. Old local dev17 (2 llvm17 commits on a stale
+   pre-rebase dev16 base; rebase conflicted) abandoned in place → `dev17` cut
+   FRESH from origin/dev16 head `384c63e`, pushed as new `seahorn/sea-dsa:dev17`;
+   old work kept on `dev17-pre-sync`. Port = cherry-pick of exactly the two
+   known 16→17 items (find_package 17.0; Optional.h→<optional> + <set>), pick
+   shrank to 3 files (dev16's style commit had pre-converted 3). Clean build
+   vs 17.0.6; the durable 16→17 delta table confirmed complete for sea-dsa.
+**Gates (all baseline-locked vs dev16):** lit 30/52 with IDENTICAL 22-failure
+   set; 63/63 emitted graphs label-isomorphic (check_graphs.py, the strong
+   gate); units 7/8 with the 1 failure (FirstPrimT.LL_reverse) reproduced on
+   a dev16+LLVM16 worktree baseline — all failures pre-exist.
+**Env find:** pygraphviz was missing → lit graph checks crashed en masse
+   (46/52 bogus fails on any binary); installed, real baseline emerged. dot
+   output proven nondeterministic per-run → never diff, always isomorphism.
+   Trail: journal/2026-07/2026-07-09-seadsa-dev17-port.md.
+**Next-session pickup:** push dev17 (2 ahead of origin/dev17); seahorn +
+   llvm-seahorn dev17 branches when their time comes; diagnose the 22+1
+   pre-existing sea-dsa test failures (stale expectations vs real).
+
 ## 2026-07-09
 **Session:** ShadowMem new-PM port; PM perf A/B; PR 586 MERGED; lineage syncs
 **Theme:** Ported ShadowMem to the new PM with wrapper symmetry (sea-dsa

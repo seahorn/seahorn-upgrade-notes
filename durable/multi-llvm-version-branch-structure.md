@@ -31,6 +31,15 @@ opaque-ptr work onto dev14 head (branch `dev15-on-dev14`). Heuristic: when a dev
 failure looks like an unhandled intrinsic / removed API, check
 `git log 57751d38..origin/dev14` first — the fix likely already exists in dev14.
 
+[FACT] **sea-dsa dev17 (created 2026-07-09)**: cut FRESH from `origin/dev16`
+head `384c63e` (includes ShadowMemNewPmPass) and pushed as new branch
+`seahorn/sea-dsa:dev17`. The PREVIOUS local dev17 (2 llvm17 commits on a
+pre-rebase dev16 lineage) was NOT rebased — its base predated real dev16
+content (31 files of delta, rebase conflicted) — and survives as local
+`dev17-pre-sync`. Precedent: when a devN branch's base is stale by more than
+rebased twins, re-cut fresh from devN-1 head and cherry-pick the delta rather
+than untangle the old lineage.
+
 ## Why this matters
 
 The pristine-on-prior rule keeps each version's config inherited and the
