@@ -27,9 +27,19 @@ session produced notes, code, or decisions worth pointing back to.
    terms (job was long-disabled; pre-existing vs dev18 regression baseline
    in flight) → loose-ends/parked.md. SimplifyPointerLoops pointer-IV issue
    drafted for GitHub (gh token stale) → parked.md.
-**Next-session pickup:** cex-y2 verdict + blacklist-or-bisect; file the
-   SimplifyPointerLoops issue; realign local dev17/dev18 branches to org
-   twins; delete backup branches (dev1[78]-pre-*, dev17-old lineages).
+**Update (07-15, same session):** cex-y2 root-caused and FIXED at the core —
+   seahorn PR #592 MERGED (yices bridge: const-array→lambda rejected by
+   contexts; pre-encode select expansion; units_yices2 regression test;
+   durable/yices-bridge-gotchas.md distilled). The 11 tests blacklisted for
+   the same cause since LLVM14 now pass. vac failure = pre-existing backedge
+   at bound=4 (parked). Shaobo He's foreign-node cleanup (sea-dsa PR #179)
+   ported dev14→dev18, fully gated (incl. vcc 228/228), pushed DIRECT to
+   seahorn/sea-dsa:dev18 (b6835bd, user-authorized).
+**Next-session pickup:** dispatch dev18 nightly (picks up #592 + foreign-node
+   cleanup) → rerun PR #146 CI → shrink cex-y2 blacklist to empty + vac
+   blacklist add; file SimplifyPointerLoops + vac-bound issues; realign local
+   dev17/dev18 branches to org twins; delete backup branches
+   (dev1[78]-pre-*, dev17-old lineages).
 
 ## 2026-07-09 (dev17 kickoff, saved 07-14)
 **Session:** sea-dsa dev17: fresh branch cut + LLVM-17 port, all gates locked

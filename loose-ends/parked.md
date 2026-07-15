@@ -24,9 +24,10 @@ journal/2026-07/2026-07-03-indvar-tied-to-bounded-flows.md +
 durable/seaopt-O-pipeline.md.)
 
 ## verify-c-common cex+y2: 13 fat-mem tests die on yices lambda terms
-**Status:** FIXED 2026-07-15 (same session, user chose core fix over
-   blacklist): seahorn commit `fix(smt): expand const-array selects for yices
-   instead of lambdas` on fork branch dev18-yices-constarray, PR pending.
+**Status:** FIXED and MERGED 2026-07-15 (seahorn PR #592, incl. the
+   units_yices2 regression test). Remaining follow-ups: dispatch a dev18
+   nightly so PR #146 sees the fixed image; then shrink blacklist.cex-y2.txt
+   to empty (the 11 same-cause blacklisted tests pass 11/11 with the fix).
    Root cause: yices marshals const-array as yices_lambda (yices2#271) but
    contexts reject lambdas; tracking-mem zero-inits metadata with
    const-arrays, and since opaque ptrs the select(store/ite...(const-array))
@@ -68,6 +69,24 @@ durable/seaopt-O-pipeline.md.)
 **Effort estimate:** blacklist route ~1h; regression route ~1-2 days (opsem).
 **References:** journal/2026-07/2026-07-14-dev17-dev18-waves.md; PR #146 CI
    run; local logs vcc-dev18-y2b.log (non-cex y2 228/228).
+
+## verify-c-common vac: hash_table_eq_unsat_test backedge-at-bound failure
+**Status:** parked 2026-07-15 (fork-agent diagnosis; pre-existing)
+**Context:** the re-enabled `--vac` CI job fails one test with
+   `assertion failed (sat) hash_table.c:754 backedge!!` — the vacuity harness
+   runs `--assert-on-backedge=true --bound=4` and a hash_table.c loop
+   backedge survives the unroll bound. Identical on dev16/17/18 (z3-based;
+   unrelated to the yices fix). Same disabled-job-hid-it pattern as cex-y2.
+   dev14-in-container fails instantly (harness/flag mismatch) so no clean
+   dev14 baseline.
+**To resume:** add hash_table_eq_unsat_test to blacklist.vac.txt with a
+   comment (pre-existing backedge at bound=4, hash_table.c:754, identical
+   dev16/17/18) for PR #146; file an issue to investigate the right unroll
+   bound for this harness. Watch: vac job runtime dominated by
+   array_list_swap_unsat_test (619s in CI) vs job timeout.
+**Effort estimate:** blacklist ~15min; bound investigation ~0.5-1 day.
+**References:** journal/2026-07/2026-07-15-yices-constarray-fix.md (vac
+   verdict section); PR #146 CI run.
 
 ## SimplifyPointerLoops: pointer-IV detection disabled (needs opaque-ptr port)
 **Status:** parked 2026-07-14 (user flagged: might still be important — file a
