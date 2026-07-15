@@ -97,6 +97,44 @@ AND emission order is unstable (same binary, two runs differ even after
 address normalization). `check_graphs.py <a> <b> both` is the gate. Run lit
 directly: `SEADSA=<build>/bin/seadsa lit -s --param test_dir=<build>/tests tests`.
 
+[FACT] **GitHub Actions mechanics batch** (learned the hard way across the
+dev17/dev18 waves, 2026-07-14/15):
+- **Scheduled (cron) workflows run ONLY from the default branch** (`main`).
+  The nightly pattern: the workflow file lives on main and pins the branch it
+  builds via `ref: devN` in its checkout step (dev14 nightly = seahorn-docker
+  .yml; dev18 = seahorn-docker-dev18.yml at 03:00 UTC, offset from dev14's
+  00:00). Per-devN-branch copies of scheduled workflows are inert.
+- **workflow_dispatch runs the workflow FILE of the branch selected in the
+  dropdown** (org branches only) — but any `ref:` pinned in a checkout step
+  inside overrides what source tree the job builds. The buildpack-deps
+  workflow now pins its checkout, so dispatch branch choice doesn't matter.
+- **actions/cache does NOT save when the job fails** (save runs in a
+  success-gated post step; `save-always` is deprecated). A red run rebuilds
+  cold next time. For debug-phase workflows, split restore/save with
+  `if: always()` on the save.
+- **GHCR packages are created PRIVATE by default** on first CI push; a
+  downstream anonymous `FROM ghcr.io/...` fails with "denied" until the
+  package is flipped public (org → Packages → settings → visibility).
+  Symptom of a missing tag/image at `docker run`: exit code 125.
+- `permissions: packages: write` (not read) is required to push/create a
+  package with GITHUB_TOKEN — error: "installation not allowed to Create
+  organization package".
+- **PR checks only re-fire when the HEAD moves** (`synchronize` event) —
+  fixing the BASE branch alone re-fires nothing, and a broken base can even
+  prevent the test-merge commit from computing (PR shows conflicts AND zero
+  checks). Cure: cosmetic `--amend --no-edit` + force-push to the PR head.
+- ctest `-E "()"`: an EMPTY exclude regex (e.g. from a missing blacklist
+  file) matches every test name → "No tests were found!!!". verify-c-common's
+  CI guards this with a test -f fallback; hand-built commands must too.
+
+[FACT] **The devN release chain** (as of dev18): seahorn `main` nightly
+(ref-pinned to devN) → `ghcr.io/seahorn/seahorn-llvmN:nightly` (public) →
+verify-c-common's `docker/verify-c-common.Dockerfile` FROM that image with
+clang-N/llvm-link-N inside. Bumping verify-c-common to a new SeaHorn line =
+that one Dockerfile (base image + 3 tool names); everything else carries.
+Merge order for a new devN: devN port PRs → nightly workflow on main →
+first image published + made public → verify-c-common switch.
+
 ## Why this matters
 
 None of these are discoverable from the code; each produces a confusing failure

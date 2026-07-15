@@ -40,6 +40,18 @@ content (31 files of delta, rebase conflicted) — and survives as local
 rebased twins, re-cut fresh from devN-1 head and cherry-pick the delta rather
 than untangle the old lineage.
 
+[FACT] **The devN wave pattern (validated twice in one day, dev17 and dev18,
+2026-07-14)**: per repo, (1) push PRISTINE org devN = devN-1 head (llvm-seahorn
+needed a FORCE-push both times — its org devN branches pre-existed at old
+pre-newpm lineages, preserved locally as devN-pre-newpm); (2) port on the
+fork; (3) PR fork:devN → org:devN shows only the version delta; (4) merge
+order: sea-dsa + llvm-seahorn first (seahorn CI clones both BY BRANCH), then
+buildpack image, then seahorn. seahorn's buildpack bootstrap commit can BE the
+pristine-branch push (base born with the fixed workflow — dev18 did this,
+avoiding dev17's separate fix-push). All merges produce twin SHAs; local
+branches need post-wave realignment (still pending for dev17+dev18 as of
+2026-07-15).
+
 ## Why this matters
 
 The pristine-on-prior rule keeps each version's config inherited and the

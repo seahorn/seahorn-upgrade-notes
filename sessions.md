@@ -3,6 +3,34 @@
 Curated index of significant sessions. Newest first. Add an entry only when a
 session produced notes, code, or decisions worth pointing back to.
 
+## 2026-07-14/15 (the dev17 + dev18 waves)
+**Session:** dev17 wave shipped end-to-end; dev18 wave same-day (fork agent);
+   nightly chain; verify-c-common onto dev18
+**Milestones:** dev17: sea-dsa #180, llvm-seahorn #25, seahorn #588 all
+   MERGED (pristine-base + fork-PR pattern; llvm-seahorn redone on the newpm
+   base, seaopt 3-way ZERO conflicts; seahorn 6 commits, vcc 228/228). dev18:
+   sea-dsa #181 (SeaDsaAA new-PM analysis for --sea-dsa-aa-eval),
+   llvm-seahorn #26 (point-release skew fix: corpus and CI must share the
+   LLVM point release — 18.1.3 vs 18.1.8 fold differently), seahorn dev18 —
+   all MERGED. Nightly: seahorn-docker-dev18.yml on main (cron 03:00 +
+   dispatch with tag input) → ghcr seahorn-llvm18:nightly (public);
+   verify-c-common Dockerfile moved onto it (PR #146), validated locally in
+   the container (default 227/227, y2 228/228).
+**Key learnings distilled to durables:** GitHub CI mechanics batch (scheduled-
+   from-default-branch + ref-pin nightly pattern, cache-not-saved-on-failure,
+   GHCR private-by-default, packages:write, PR-checks-need-head-move, ctest
+   empty-exclude-regex trap) → build-and-ci-gotchas; 16→17 + 17→18 API
+   additions incl. include-cascade diagnosis order and the sea-driver
+   hardcoded clang version → llvm-version-api-deltas; devN wave pattern →
+   multi-llvm-version-branch-structure.
+**Open:** PR #146's cex+y2 config fails 13 fat-mem tests on yices lambda
+   terms (job was long-disabled; pre-existing vs dev18 regression baseline
+   in flight) → loose-ends/parked.md. SimplifyPointerLoops pointer-IV issue
+   drafted for GitHub (gh token stale) → parked.md.
+**Next-session pickup:** cex-y2 verdict + blacklist-or-bisect; file the
+   SimplifyPointerLoops issue; realign local dev17/dev18 branches to org
+   twins; delete backup branches (dev1[78]-pre-*, dev17-old lineages).
+
 ## 2026-07-09 (dev17 kickoff, saved 07-14)
 **Session:** sea-dsa dev17: fresh branch cut + LLVM-17 port, all gates locked
 **Theme:** First dev17 work. Old local dev17 (2 llvm17 commits on a stale

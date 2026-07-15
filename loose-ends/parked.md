@@ -23,6 +23,29 @@ Uncommitted. Captured in
 journal/2026-07/2026-07-03-indvar-tied-to-bounded-flows.md +
 durable/seaopt-O-pipeline.md.)
 
+## verify-c-common cex+y2: 13 fat-mem tests die on yices lambda terms
+**Status:** parked 2026-07-15, dev14 baseline running at save time (verdict
+   to be appended here)
+**Context:** on verify-c-common PR #146 (CI image moved to the dev18 nightly),
+   the re-enabled `--cex --horn-bmc-solver=smt-y2` matrix config fails 13
+   tests — ALL `*2_unsat_test` (fat/extra-widemem/tracking-mem variants) —
+   with `LLVM ERROR: yices_solver_impl::add: yices_assert_formula failed:
+   the context does not support lambda terms`, despite
+   `--horn-bv2-lambdas=false`. The non-cex y2 config passes 228/228, so the
+   lambda term enters via the --cex extras (hexdump/tracking-mem path).
+   CRITICAL CONFOUND: this CI job had been DISABLED and was only just
+   re-enabled — the cex-y2 blacklist may simply be stale, i.e. pre-existing
+   failure, not a dev18 regression.
+**To resume:** (1) read the dev14-image baseline verdict below; (2) if
+   pre-existing → extend blacklist.cex-y2.txt with the 13 tests + file an
+   issue; if dev18 regression → bisect the encoding: what emits a lambda
+   under --cex + tracking-mem/extra-widemem when --horn-bv2-lambdas=false
+   (suspects: hexdump memory dumps, symbolic memcpy fallback past
+   --horn-array-sym-memcpy-unroll-count).
+**Effort estimate:** blacklist route ~1h; regression route ~1-2 days (opsem).
+**References:** journal/2026-07/2026-07-14-dev17-dev18-waves.md; PR #146 CI
+   run; local logs vcc-dev18-y2b.log (non-cex y2 228/228).
+
 ## SimplifyPointerLoops: pointer-IV detection disabled (needs opaque-ptr port)
 **Status:** parked 2026-07-14 (user flagged: might still be important — file a
    GitHub issue on seahorn/seahorn; draft ready at the session tmp

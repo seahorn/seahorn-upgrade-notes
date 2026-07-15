@@ -44,6 +44,18 @@ log, NOT blanket seds (see llvm-seahorn-upstream-rebase-strategy.md for why).
 - LoopUnroll: `getUserCost`→`getInstructionCost`; `computeUnrollCount`/
   `computePeelCount` gained `AssumptionCache *AC`; `createSimpleLoopUnrollPass` gone.
 - `StandardInstrumentations::registerCallbacks` takes `&MAM` not `&FAM`.
+- seahorn additions (port shipped 2026-07-14, PR 588): dropped transitive
+  includes — 9 files need direct `llvm/ADT/SmallString.h` (+ StringExtras.h
+  for `SplitString`); missing-include errors CASCADE into bogus
+  "no viable conversion" overload errors in the same TU — fix includes FIRST,
+  re-diagnose after. `APInt::isOneValue/isNullValue`→`isOne/isZero`.
+  `Type::getPointerElementType` REMOVED (typed ptrs gone): SimpleMemoryCheck
+  dead branch deleted; SimplifyPointerLoops pointer-IV detection bails (see
+  loose-ends — was assert-broken under opaque ptrs since 15 anyway).
+  `Debugify.registerCallbacks(PIC, MAM)`. PGOOptions gained MemoryProfile+FS
+  params. `initializeHardwareLoopsLegacyPass` rename. The sea python driver
+  HARDCODES clang/llvm-link version names (py/sea/commands.py) — bump per
+  version; build run/bin symlinks clang-N/llvm-link-N to the toolchain.
 
 [FACT] **17 → 18**:
 - StringRef `startswith/endswith`→`starts_with/ends_with`.
@@ -55,6 +67,20 @@ log, NOT blanket seds (see llvm-seahorn-upstream-rebase-strategy.md for why).
 - LoopUnroll: ApproximateLoopSize folded into
   `UnrollCostEstimator(L,TTI,EphValues,BEInsns)`.
 - CMake: `find_package(LLVM 18.1 ...)` (NOT 18 — 18 ships only as 18.1.x).
+- CONFIRMED for all three repos (2026-07-14, ports merged): seahorn hit ~55
+  starts_with/ends_with sites + ~85 getInt8PtrTy sites
+  (`PointerType::getUnqual`/`IRBuilder::getPtrTy`), SizeOffsetAPInt/
+  SizeOffsetValue (SimpleMemoryCheck, FatBufferBoundsCheck),
+  `getConstantRange` explicit `UndefAllowed` arg, PromoteMemcpy dead
+  typed-ptr branch deleted, legacy CallGraphPrinter init removed. sea-dsa:
+  `createAAEvalPass` removal answered with a new-PM `SeaDsaAA` analysis
+  (wrapper symmetry, seadsa registered ahead of BasicAA) instead of stubbing
+  --sea-dsa-aa-eval out.
+- **POINT-RELEASE SKEW**: InstCombine output depends on the LINKED LLVM libs
+  (InstSimplify/ValueTracking), not just the forked sources — 18.1.3 vs
+  18.1.8 fold differently. The sea_instcombine corpus and CI must use the
+  SAME point release (CI now installs 18.1.8 from apt.llvm.org; noble's
+  archive has 18.1.3). Applies to every future version bump.
 
 ## Why this matters
 
