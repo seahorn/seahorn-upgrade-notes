@@ -1,4 +1,4 @@
-# Project: SeaHorn dev16 upgrade (LLVM 16 + new PassManager)
+# Project: SeaHorn LLVM upgrades (dev16/17/18 waves; new PassManager)
 
 These notes live in this directory (`seahorn-upgrade-notes/` at the workspace
 root; the workspace `CLAUDE.md` points here via its "Notes at:" line).
@@ -6,13 +6,16 @@ root; the workspace `CLAUDE.md` points here via its "Notes at:" line).
 The better-than-fish skill governs how to add and maintain notes — re-read its
 SKILL.md for conventions (markers, tiers, supersede-on-correction, distillation).
 
-Scope: porting SeaHorn from LLVM 15 (dev15) to LLVM 16 (dev16) — new-PM
-migration of seapp/seaopt, sea-dsa port, opsem/verify-c-common parity. Out of
-scope: one-off coding chores, transient PR/branch status.
+Scope: porting SeaHorn across LLVM versions (dev16 shipped incl. new-PM
+migration; dev17 and dev18 shipped 2026-07-14/15) — seapp/seaopt/sea-dsa/
+llvm-seahorn ports, opsem/verify-c-common parity, nightly + downstream CI
+chain, solver-bridge fixes. Out of scope: one-off coding chores, transient
+PR/branch status.
 
 ## Three repos under upgrade
 
-All three are git repos with a `dev16` branch (forked from `dev15`):
+All three are git repos with devN branches (each pristine-forked from
+devN-1; dev18 is current):
 
 - seahorn      `~/seahorn/seahorn-upgrade/seahorn/`        (build: `build-dev16`)
 - sea-dsa      `~/seahorn/seahorn-upgrade/sea-dsa/`        (build: `build-dev16`)
