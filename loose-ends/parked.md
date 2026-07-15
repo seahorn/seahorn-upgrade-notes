@@ -24,8 +24,19 @@ journal/2026-07/2026-07-03-indvar-tied-to-bounded-flows.md +
 durable/seaopt-O-pipeline.md.)
 
 ## verify-c-common cex+y2: 13 fat-mem tests die on yices lambda terms
-**Status:** parked 2026-07-15, dev14 baseline running at save time (verdict
-   to be appended here)
+**Status:** parked 2026-07-15 — VERDICT IN: pre-existing since dev15, NOT a
+   dev18 regression. Bisect by line (same test, same cex-y2 flags):
+   dev14 image 13/13 PASS; dev15, dev16, dev17, dev18 local builds ALL fail
+   with the identical yices lambda error, crashing at ENCODE time
+   (SolverBmcEngine::encode) — the lambda is emitted by the opsem encoding,
+   solver version irrelevant. Introduced in the dev14->dev15 port
+   (LLVM 15 / opaque-pointer era). Prime suspect: symbolic memcpy under
+   opaque pointers — sizes that were concrete under typed pointers stay
+   symbolic and the encoding falls back to a lambda past
+   --horn-array-sym-memcpy-unroll-count, despite --horn-bv2-lambdas=false
+   (which gates memory representation, not this fallback). Unblock for
+   PR #146: add the 13 tests to blacklist.cex-y2.txt (documented known
+   failure) + file an issue.
 **Context:** on verify-c-common PR #146 (CI image moved to the dev18 nightly),
    the re-enabled `--cex --horn-bmc-solver=smt-y2` matrix config fails 13
    tests — ALL `*2_unsat_test` (fat/extra-widemem/tracking-mem variants) —
