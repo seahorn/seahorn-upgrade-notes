@@ -71,18 +71,28 @@ durable/seaopt-O-pipeline.md.)
    run; local logs vcc-dev18-y2b.log (non-cex y2 228/228).
 
 ## verify-c-common vac: hash_table_eq_unsat_test backedge-at-bound failure
-**Status:** parked 2026-07-15 (fork-agent diagnosis; pre-existing)
+**Status:** parked 2026-07-15 (fork-agent diagnosis; pre-existing SINCE JAN
+   2021 — supersedes the earlier "since dev16" framing)
 **Context:** the re-enabled `--vac` CI job fails one test with
    `assertion failed (sat) hash_table.c:754 backedge!!` — the vacuity harness
    runs `--assert-on-backedge=true --bound=4` and a hash_table.c loop
    backedge survives the unroll bound. Identical on dev16/17/18 (z3-based;
    unrelated to the yices fix). Same disabled-job-hid-it pattern as cex-y2.
    dev14-in-container fails instantly (harness/flag mismatch) so no clean
-   dev14 baseline.
+   dev14 baseline. PROVENANCE (fork follow-up): blacklisted for vac in Jan
+   2021 (e798353); vac job later disabled entirely; user's 2026-04-30 commit
+   958d9e1 "unblacklist passing vac tests" removed it while the job was NOT
+   running; this week = first real CI run since 2021. Mechanics:
+   hash_table.c:754 loops over the SYMBOLIC table size — bound=4 cannot
+   contain it without a harness precondition capping size (missing). Also
+   noted: the CI Dockerfile clones aws-c-common UNPINNED (fresh master per
+   image build) — reproducibility hazard, not the culprit here.
 **To resume:** add hash_table_eq_unsat_test to blacklist.vac.txt with a
-   comment (pre-existing backedge at bound=4, hash_table.c:754, identical
-   dev16/17/18) for PR #146; file an issue to investigate the right unroll
-   bound for this harness. Watch: vac job runtime dominated by
+   comment (backedge at bound=4, hash_table.c:754, blacklisted 2021-2026,
+   unblacklisted while job disabled) for PR #146; file an issue proposing a
+   harness precondition capping the symbolic table size (or a larger bound
+   for the vac job); consider pinning the aws-c-common clone in the
+   Dockerfile. Watch: vac job runtime dominated by
    array_list_swap_unsat_test (619s in CI) vs job timeout.
 **Effort estimate:** blacklist ~15min; bound investigation ~0.5-1 day.
 **References:** journal/2026-07/2026-07-15-yices-constarray-fix.md (vac
