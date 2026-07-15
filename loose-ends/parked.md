@@ -24,8 +24,20 @@ journal/2026-07/2026-07-03-indvar-tied-to-bounded-flows.md +
 durable/seaopt-O-pipeline.md.)
 
 ## verify-c-common cex+y2: 13 fat-mem tests die on yices lambda terms
-**Status:** parked 2026-07-15 — VERDICT IN: pre-existing since dev15, NOT a
-   dev18 regression. Bisect by line (same test, same cex-y2 flags):
+**Status:** FIXED 2026-07-15 (same session, user chose core fix over
+   blacklist): seahorn commit `fix(smt): expand const-array selects for yices
+   instead of lambdas` on fork branch dev18-yices-constarray, PR pending.
+   Root cause: yices marshals const-array as yices_lambda (yices2#271) but
+   contexts reject lambdas; tracking-mem zero-inits metadata with
+   const-arrays, and since opaque ptrs the select(store/ite...(const-array))
+   shapes survive simplification into the asserted formula. Fix = pre-encode
+   rewrite in yices_solver_impl::add pushing selects through store/ite
+   skeletons that bottom out in const-array (select-over-store axiom; DAG
+   memoized; havoc'd memories untouched). Gates: 13/13 fixed, cex-y2 217/217,
+   the 11 HISTORICALLY BLACKLISTED same-cause tests now 11/11 (blacklist can
+   shrink to empty once a fixed nightly publishes), y2 228/228, opsem2 42/42,
+   opsem 125+1. Earlier verdict (kept for the record): pre-existing since
+   dev15, NOT a dev18 regression. Bisect by line (same test, same cex-y2 flags):
    dev14 image 13/13 PASS; dev15, dev16, dev17, dev18 local builds ALL fail
    with the identical yices lambda error, crashing at ENCODE time
    (SolverBmcEngine::encode) — the lambda is emitted by the opsem encoding,
