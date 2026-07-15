@@ -35,11 +35,17 @@ session produced notes, code, or decisions worth pointing back to.
    at bound=4 (parked). Shaobo He's foreign-node cleanup (sea-dsa PR #179)
    ported dev14→dev18, fully gated (incl. vcc 228/228), pushed DIRECT to
    seahorn/sea-dsa:dev18 (b6835bd, user-authorized).
-**Next-session pickup:** dispatch dev18 nightly (picks up #592 + foreign-node
-   cleanup) → rerun PR #146 CI → shrink cex-y2 blacklist to empty + vac
-   blacklist add; file SimplifyPointerLoops + vac-bound issues; realign local
-   dev17/dev18 branches to org twins; delete backup branches
-   (dev1[78]-pre-*, dev17-old lineages).
+**Final update (07-15 evening): PR #146 GREEN 9/9, zero failures** — nightly
+   dispatched+published (digest watch), five commits on the PR (image, vac
+   re-blacklist, cex-y2 blacklist EMPTIED — 228/228 for the first time ever,
+   codecov non-fatal for fork PRs, cex 18 z3-perf stragglers blacklisted with
+   provenance). Third stale-blacklist config woken and settled. Trail:
+   journal/2026-07/2026-07-15-pr146-green-board.md.
+**Next-session pickup:** merge PR #146 (user click); try QF_ABV on the plain
+   cex job (likely greens the 18 → shrink that blacklist too); file issues:
+   SimplifyPointerLoops pointer-IV, vac bound-4 precondition, aws-c-common
+   pin, codecov v2→v5; realign local dev17/dev18 branches to org twins;
+   delete backup branches (dev1[78]-pre-*, dev17-old lineages).
 
 ## 2026-07-09 (dev17 kickoff, saved 07-14)
 **Session:** sea-dsa dev17: fresh branch cut + LLVM-17 port, all gates locked

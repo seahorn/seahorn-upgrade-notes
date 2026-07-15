@@ -127,6 +127,16 @@ dev17/dev18 waves, 2026-07-14/15):
   file) matches every test name → "No tests were found!!!". verify-c-common's
   CI guards this with a test -f fallback; hand-built commands must too.
 
+[FACT] **Secrets are withheld from fork-PR workflow runs** (GitHub policy):
+`pull_request` runs from forks see no repository secrets. Bit verify-c-common's
+fuzz job: codecov-action fell back to a TOKENLESS upload, codecov 429-rate-
+limited it, and `fail_ci_if_error: true` turned that into a red job. Treatment:
+`fail_ci_if_error: false` (coverage best-effort on fork PRs; push runs with the
+secret unaffected). Check any job with `secrets.*` + `fail_ci_if_error`/hard
+dependence when a fork PR fails mysteriously. Related hygiene noted in vcc:
+codecov-action pinned at deprecated v2; aws-c-common cloned UNPINNED in the
+Dockerfile (fresh master per image build).
+
 [FACT] **The devN release chain** (as of dev18): seahorn `main` nightly
 (ref-pinned to devN) → `ghcr.io/seahorn/seahorn-llvmN:nightly` (public) →
 verify-c-common's `docker/verify-c-common.Dockerfile` FROM that image with

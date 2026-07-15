@@ -70,6 +70,21 @@ durable/seaopt-O-pipeline.md.)
 **References:** journal/2026-07/2026-07-14-dev17-dev18-waves.md; PR #146 CI
    run; local logs vcc-dev18-y2b.log (non-cex y2 228/228).
 
+## verify-c-common cex (plain z3): 18 proofs time out / return unknown
+**Status:** parked 2026-07-15 (blacklisted with provenance on PR #146; third
+   stale-blacklist config after cex-y2 and vac)
+**Context:** without `--horn-bmc-logic=QF_ABV`, z3 cannot close 18 of the cex
+   proofs (16 exceed 2000s; hash_iter_begin2/begin_done2 return `unknown` in
+   0.8s/25s). The SAME tests pass in seconds under cex+smt-y2 (which now runs
+   fully unblacklisted). Pre-existing: dev16 sample times out identically.
+**To resume:** investigate the z3-vs-yices gap on these formulas — most
+   likely fix is simply passing QF_ABV in the cex job's VERIFY_FLAGS (matrix
+   currently omits it for the plain cex entry); if that greens them, shrink
+   this blacklist too.
+**Effort estimate:** ~1h experiment (run cex config + QF_ABV locally).
+**References:** journal/2026-07/2026-07-15-pr146-green-board.md;
+   blacklist.cex.txt comment block (in-repo provenance).
+
 ## verify-c-common vac: hash_table_eq_unsat_test backedge-at-bound failure
 **Status:** parked 2026-07-15 (fork-agent diagnosis; pre-existing SINCE JAN
    2021 — supersedes the earlier "since dev16" framing)
