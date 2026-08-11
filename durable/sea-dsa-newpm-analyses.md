@@ -30,6 +30,28 @@ analysis survived into a *function* pipeline only "so long as the first function
 pass doesn't invalidate it" — the exact fragile GlobalsAA-stays-alive behavior
 dev15's `PassManagerBuilder.cpp` relied on.
 
+[FACT] **A pass's preserved set is a lifetime contract, not just a freshness
+hint.** `PreservedAnalyses::none()` frees the cached results *immediately*, so
+any object the pass publishes that borrows from a result becomes dangling. This
+bit `ShadowMemNewPmPass::run`: it moves the constructed `ShadowMem` into
+`*m_keep`, `ShadowMem` holds the `seadsa::GlobalAnalysis` **by reference**, and
+that `GlobalAnalysis` is owned by `DsaInfoAnalysis::Result` — so `none()` made
+every later `ShadowMem::getDsaAnalysis()` a use-after-free. Fix = return
+`PA.preserve<DsaInfoAnalysis>()` on top of `none()` (sea-dsa PR #189, in
+`lib/seadsa/ShadowMem.cc`); this also matches the legacy PM, where the
+`DsaAnalysis` pass outlived the instrumentation. Rule: if a new-PM pass hands
+out anything that borrows from a cached result, it must preserve that analysis.
+
+[FACT] **sea-dsa has two consumer channels, and only one runs through the IR.**
+sea-dsa → **seahorn** communicates *through the IR* (shadow-memory
+instrumentation) — preserving sea-dsa data structures is explicitly not that
+design. sea-dsa → **clam** (linked as a library inside seahorn) communicates
+*through the data structures*: clam calls
+`seadsa::ContextSensitiveGlobalAnalysis` / `ContextInsensitiveGlobalAnalysis`
+directly, with no pass manager on that edge. That second channel is why result
+lifetime matters at all, and why preserving `DsaInfoAnalysis` does not
+contradict the IR-based design. (caballa/agurfinkel, sea-dsa PR #189 review.)
+
 [FACT] sea-dsa's TLI is threaded as a `seadsa::TargetLibraryInfoGetter`
 (`std::function`, in `include/seadsa/TargetLibraryInfoGetter.hh`) everywhere
 instead of the legacy `TargetLibraryInfoWrapperPass`. Legacy passes adapt via
@@ -42,9 +64,14 @@ When porting a sea-dsa consumer, pick the construct/cache pattern by what the
 analysis needs (ImmutablePass → local instance; scheduled analysis → getResult
 from MAM). The only thing without a clean legacy analog is invalidation — design
 the `invalidate` per Result rather than relying on a mutating pass's preserved
-set.
+set. And when a pass publishes state (an out-parameter, a `unique_ptr` moved to
+a consumer), audit what that state *borrows*: under the legacy PM a scheduled
+analysis outlived the pipeline by accident, under the new PM it is freed on the
+preserved set you return.
 
 ## See also
 
 - seapp-newpm-migration-patterns.md
+- ../journal/2026-08/2026-08-11-shadowmem-preserves-dsainfo.md (the UAF that
+  established the lifetime-contract fact; clam is the consumer that exposed it)
 - ../sea-dsa is at ~/seahorn/seahorn-upgrade/sea-dsa (branch dev16)

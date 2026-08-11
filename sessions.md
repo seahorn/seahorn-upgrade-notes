@@ -3,6 +3,24 @@
 Curated index of significant sessions. Newest first. Add an entry only when a
 session produced notes, code, or decisions worth pointing back to.
 
+## 2026-08-11 (KB update from sea-dsa PR #189 review)
+**Session:** captured the ShadowMem/DsaInfoAnalysis dangling-reference bug and
+   its review thread into the KB (no code work; notes only)
+**Key outputs:**
+- journal/2026-08/: 2026-08-11-shadowmem-preserves-dsainfo (the UAF, the
+   clam-only exposure, the two-channel design answer, the review asks)
+- durable/sea-dsa-newpm-analyses.md: two new facts — the preserved set is a
+   *lifetime* contract for anything a pass publishes by reference; sea-dsa →
+   seahorn goes through the IR while sea-dsa → clam goes through the data
+   structures (clam calls the GlobalAnalysis directly, no PM)
+- loose-ends/parked.md: +2 entries (port #189 to dev17/dev18; clam-ON CI entry
+   for verify-c-common, owner priyasiddharth) and the clam alloc-detection
+   entry's premise refreshed (clam now ported to LLVM 16 via seahorn PR #596)
+**Trigger:** priyasiddharth on PR #189 — "Can you possibly keep
+   seahorn-upgrade-notes KB up-to-date as you discover dangling refs bugs and
+   such?"; caballa agreed to do the update.
+**Status:** complete (notes only; the dev17/dev18 ports remain to do)
+
 ## 2026-07-14/15 (the dev17 + dev18 waves)
 **Session:** dev17 wave shipped end-to-end; dev18 wave same-day (fork agent);
    nightly chain; verify-c-common onto dev18

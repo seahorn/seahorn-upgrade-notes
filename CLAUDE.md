@@ -50,7 +50,10 @@ Use ctest at `~/cmake-3.31.7-linux-x86_64/bin/ctest` (NOT the pip shim).
 
 See `loose-ends/parked.md`. Quick view:
 
-- clam malloc/free detection on LLVM 16 (carried over; clam compiled out)
+- port sea-dsa PR #189 (ShadowMem preserves DsaInfoAnalysis) to dev17/dev18
+- clam-ON entry in the verify-c-common CI matrix (owner: priyasiddharth)
+- clam malloc/free detection on LLVM 16 (carried over; clam now builds on 16,
+  but stays optional — `WITH_CLAM=OFF` for primary CI by decision)
 - (resolved 07-03/07-06) indvars-for-BMC + avoid-bv-off-for-BMC: llvm-seahorn
   `8e7e6c6` (pushed to origin/dev16); seahorn `7dc45541` + `419bc407`
   (committed, not pushed)
