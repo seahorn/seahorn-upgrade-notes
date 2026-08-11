@@ -133,17 +133,59 @@ durable/seaopt-O-pipeline.md.)
 **References:** journal/2026-07 (dev17 seahorn port); seahorn PR #588 commit
    `fix(llvm17): port sources to LLVM 17 API removals`.
 
+## sea-dsa PR #189 (ShadowMem preserves DsaInfoAnalysis) must be ported to dev17/dev18
+**Status:** parked 2026-08-11 (fix approved on dev16; ports not started)
+**Context:** `ShadowMemNewPmPass::run` returned `PreservedAnalyses::none()` while
+   publishing a `ShadowMem` that holds `DsaInfoAnalysis::Result`'s
+   `GlobalAnalysis` by reference → use-after-free in every post-pass
+   `getDsaAnalysis()`. Three-line fix (`PA.preserve<DsaInfoAnalysis>()`) in
+   `lib/seadsa/ShadowMem.cc`. caballa flagged in the PR itself: "It will need to
+   be ported to dev17 and dev18." dev17/dev18 are pristine forks of dev16 and
+   both already carry ShadowMemNewPmPass, so the cherry-pick should be clean —
+   but nothing propagates it automatically, and the same UAF is live on both.
+**To resume:** cherry-pick the sea-dsa #189 commit onto `dev17` and `dev18`
+   after it merges to `dev16`; re-run the sea-dsa graph-isomorphism gate on each.
+**Effort estimate:** ~30min if the picks are clean.
+**References:** journal/2026-08/2026-08-11-shadowmem-preserves-dsainfo.md;
+   durable/sea-dsa-newpm-analyses.md; durable/multi-llvm-version-branch-structure.md
+
+## verify-c-common: no CI entry exercises clam (sea-dsa + clam + seahorn path)
+**Status:** parked 2026-08-11 (**owner: priyasiddharth** — proposed it on sea-dsa
+   PR #189, caballa asked them to do the update)
+**Context:** the ShadowMem UAF above lived for the whole dev16 cycle because
+   nothing consumed `getDsaAnalysis()` after the pass — with `WITH_CLAM=OFF` the
+   call sites are compiled out. Proposal: add a clam-ON entry to the
+   verify-c-common test matrix so sea-dsa + clam + seahorn is exercised;
+   `is_deref` is the suspected user of that path. Constraint from the parallel
+   seahorn PR #596 review (priyasiddharth, backed by agurfinkel): clam must stay
+   *optional*, since a required clam complicates future LLVM upgrades — so the
+   agreed shape is `WITH_CLAM=OFF` for primary CI plus separate nightlies with
+   and without clam, not flipping the default.
+**To resume:** add the clam-ON matrix entry / nightly; check whether the
+   clam-ON board differs from the 228/228 baseline.
+**Effort estimate:** ~half-day (CI matrix + first triage of any new failures).
+**References:** journal/2026-08/2026-08-11-shadowmem-preserves-dsainfo.md;
+   sea-dsa PR #189; seahorn PR #596
+
 ## clam: malloc/free not recognized at -O0 on LLVM 15
-**Status:** parked (carried over from dev15 work)
+**Status:** parked; **premise partially outdated as of 2026-08-11** — clam IS now
+   ported to LLVM 16 (seahorn PR #596 moves the clam clone target dev15 → dev16)
+   and buildable with `WITH_CLAM=ON`, so the "compiled out, can't check" excuse
+   is gone; the alloc-detection question itself is untested on 16.
 **Context:** clam does not recognize malloc/free at -O0 on LLVM 15 — the
    allockind attribute changed how the allocator functions are marked, so clam's
-   detection misses them. Deferred during the dev15 push; clam is built OFF
-   (`WITH_CLAM=OFF`) on dev16 (clam not ported to LLVM 16).
-**Why parked:** Not on the critical path for the dev16 upgrade (clam compiled out).
-**To resume:** When porting clam to LLVM 16, update its alloc/free detection to
-   read the `allockind` attribute rather than the older marking.
-**Effort estimate:** unknown (~half-day once clam build is up on 16).
-**References:** durable/seahorn-build-and-ci-gotchas.md
+   detection misses them. Deferred during the dev15 push. `WITH_CLAM=OFF` remains
+   the default for primary CI by deliberate decision (see the verify-c-common
+   clam entry above), but a clam-ON build now exists to test against: with it,
+   seahorn `test/crab` goes 4/7 → 7/7.
+**Why parked:** Not on the critical path for the dev16 upgrade (clam optional).
+**To resume:** build with `WITH_CLAM=ON` on dev16 and check whether alloc/free
+   detection still misses at -O0; if so, update clam's detection to read the
+   `allockind` attribute rather than the older marking.
+**Effort estimate:** unknown (~half-day; the clam-on-16 build is no longer a
+   blocker).
+**References:** durable/seahorn-build-and-ci-gotchas.md;
+   journal/2026-08/2026-08-11-shadowmem-preserves-dsainfo.md
 
 ## opsem imprecision: partially-uninitialized bitfield structs (mcfuzz issue_44)
 **Status:** parked 2026-07-08 (test disabled: test/mcfuzz/issue_44.c.disabled)
